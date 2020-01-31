@@ -1,0 +1,218 @@
+1. SELECT 
+passenger_count
+FROM `bigquery-public-data.new_york_taxi_trips.tlc_green_trips_2014` 
+Where
+passenger_count > 3 
+LIMIT 
+6
+RESULTS
+Row 	passenger_count 	
+1	       5	
+2	       5	
+3	       5	
+4	       5	
+5	       6	
+6	       5	
+
+ 
+
+2. SELECT
+  place_name,
+  rooms,
+  ROUND(AVG(surface_covered_in_m2)) AS avg_surface_covered_m2
+FROM
+  `properati-data-public.properties_co.properties_sell_201706`
+WHERE
+  property_type = "apartment"
+  AND operation = "sell"
+  AND rooms > 0
+  AND surface_covered_in_m2 > 0
+GROUP BY
+  place_name,
+  rooms
+ORDER BY
+  place_name,
+  rooms
+LIMIT 6
+RESULT:
+Row	 place_name 	rooms 	avg_surface_covered_m2 
+1	    Anapoima	   3	             108.0
+2	    Antioquia	   1	             66.0
+3	    Antioquia    2   	           86.0
+4	    Antioquia	   3      	       82.0
+5   	Aranjuez	   2	             49.0
+6   	Armenia    	 1	             45.0
+
+3. SELECT  
+  se.cause_code
+  ,COUNT(r.id) as number_of_tsunami
+FROM 
+  `bigquery-public-data.noaa_tsunami.historical_runups` r
+INNER JOIN `bigquery-public-data.noaa_tsunami.historical_source_event` se
+  ON r.tsevent_id=se.id
+WHERE se.cause_code != 0 
+GROUP BY 1
+LIMIT 6
+Row	cause_code 	number_of_tsunami 
+1     	1	       24444
+2	      9	       289
+3	      3	       1992
+4	      8	       229
+5	      6      	 303
+6	      4	       2
+
+  
+4. SELECT
+  COUNT(date_local) AS NUM_OF_DAYS,
+  CASE
+    WHEN aqi < 51 THEN "Good (green)"
+    WHEN aqi <101 THEN "Moderate (yellow)"
+    WHEN aqi <151 THEN "Unhealthy for sensitive groups (orange)"
+    WHEN aqi <201 THEN "Unhealthy (red)"
+    WHEN aqi <301 THEN "Very unhealthy (purple)"
+    WHEN aqi <501 THEN "Hazardous (maroon)"
+    ELSE "unexpected data"
+  END AS AQ_RATING
+FROM
+  `bigquery-public-data.epa_historical_air_quality.pm25_frm_daily_summary`
+WHERE
+  city_name = "Los Angeles"
+  AND state_name = "California"
+  AND sample_duration = "24 HOUR"
+  AND poc = 1
+  AND EXTRACT(YEAR FROM date_local) = 2015
+GROUP BY
+  2
+ORDER BY
+  1 DESC
+LIMIT 6     
+RESULTS:
+Row	NUM_OF_DAYS 	AQ_RATING 	
+1	  208	          Good (green)	
+2	  124	          Moderate (yellow)	
+3	  6	            Unhealthy for sensitive groups (orange)	
+4  	1	            Unhealthy (red	
+
+ 
+5.SELECT
+  COUNT(DISTINCT(fdic_certificate_number)) AS count_banks,
+  city,
+  state_name
+FROM
+  `bigquery-public-data.fdic_banks.institutions` 
+GROUP BY
+  city,
+  state_name
+ORDER BY
+  count_banks desc
+LIMIT 6
+Results
+ Row	count_banks 	city 	state_name 
+1	        313	      Houston	Texas
+2	        219	      Chicago	Illinois
+3	        198	      Dallas	Texas
+4	        140	      Los Angeles	California
+5	        108	      Denver	Colorado
+6	        107	      San Antonio	Texas
+
+
+6. SELECT
+  place_name,
+  rooms,
+  ROUND(AVG(surface_covered_in_m2)) AS avg_surface_covered_m2
+FROM
+  `properati-data-public.properties_br.properties_sell_201706`
+WHERE
+  property_type = "apartment"
+  AND operation = "sell"
+  AND rooms > 0
+  AND surface_covered_in_m2 > 0
+GROUP BY
+  place_name,
+  rooms
+ORDER BY
+  place_name,
+  rooms
+LIMIT 6
+Row	  place_name 	             rooms 	      avg_surface_covered_m2 
+1	    Aberta dos Morros	           1	             62.0
+2	    Abolição	                   1	            101.0
+3	    Abranches                    1	             44.0
+4	    Abranches	                   2	             42.0
+5   	Abraão	                     1	            101.0
+6   	Abraão	                     2	             94.0
+
+ 
+7. SELECT
+  COUNT(DISTINCT(fdic_certificate_number)) AS count_banks,
+  city,
+  state_name
+FROM
+  `bigquery-public-data.fdic_banks.institutions` 
+GROUP BY
+  city,
+  state_name
+ORDER BY
+  count_banks desc
+LIMIT 6
+ Row	count_banks 	   city   	   state_name 
+1	      313	          Houston	     Texas
+2	      219	          Chicago	     Illinois
+3	      198         	Dallas	     Texas
+4	      140	          Los Angeles	 California
+5	      108         	Denver	     Colorado
+6	      107         	San Antonio	 Texas
+
+8. SELECT
+  (SUM (total_transactions_per_user) / COUNT(fullVisitorId) ) AS avg_total_transactions_per_user
+FROM (
+  SELECT
+    fullVisitorId,
+    SUM (totals.transactions) AS total_transactions_per_user
+  FROM
+    `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+  WHERE
+    _TABLE_SUFFIX BETWEEN '20170701'
+    AND '20170731'
+    AND totals.transactions IS NOT NULL
+  GROUP BY
+    fullVisitorId )
+lIMIT 6
+ Row    	avg_total_transactions_per_user 
+  1	          1.112033195020747
+
+9. SELECT
+  device.browser,
+  SUM ( totals.transactions ) AS total_transactions
+FROM
+  `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+WHERE
+  _TABLE_SUFFIX BETWEEN '20170701'
+  AND '20170731'
+GROUP BY
+  device.browser
+ORDER BY
+  total_transactions DESC
+LIMIT 6
+Row     	browser 	       total_transactions 
+1	        Chrome	                984
+2	        Safari	                65
+3	        Firefox	                12
+4	        Internet Explorer     	7
+5	        Opera	                  2
+6	        Edge	                  2
+
+ 
+10. SELECT
+  EXTRACT(YEAR FROM creation_date) AS Year,
+  COUNT(*) AS Number_of_Questions,
+  ROUND(100 * SUM(IF(answer_count > 0, 1, 0)) / COUNT(*), 1) AS Percent_Questions_with_Answers
+FROM  `bigquery-public-data.stackoverflow.posts_questions`
+GROUP BY  Year
+HAVING
+  Year = 2015  
+  # Use to query a range of years (warning this query processes all records)
+  # Year > 2009 AND Year < 2016  ORDER BY  Year
+  
+Row 	Year 	   Number_of_Questions 	    Percent_Questions_with_Answers 	
+1	    2015             2211624             86.5
